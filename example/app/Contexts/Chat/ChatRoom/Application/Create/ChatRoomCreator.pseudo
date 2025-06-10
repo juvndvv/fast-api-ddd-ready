@@ -1,0 +1,18 @@
+"""
+PSEUDOCODE: ChatRoomCreator Application Service
+Handles the creation of chat rooms at the application layer
+"""
+
+CLASS ChatRoomCreator:
+    # Dependencies
+    _creator: DomainChatRoomCreator
+
+    CONSTRUCTOR(creator: DomainChatRoomCreator):
+        SET _creator = creator
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION create(id: string, user_id: integer) -> void:
+        # Delegate to domain service
+        AWAIT _creator.create(id, user_id)
+    END FUNCTION
+END CLASS 

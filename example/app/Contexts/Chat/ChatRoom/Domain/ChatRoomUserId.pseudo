@@ -1,0 +1,11 @@
+"""
+PSEUDOCODE: ChatRoomUserId Value Object
+Represents the user ID associated with a chat room (integer)
+"""
+
+CLASS ChatRoomUserId extends IntegerValueObject:
+    # This value object inherits all functionality from IntegerValueObject
+    # It validates that the user ID is a valid integer
+    # Provides integer conversion and comparison methods
+    # Ensures user ID is a positive integer
+END CLASS 

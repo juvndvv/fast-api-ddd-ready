@@ -1,0 +1,50 @@
+"""
+PSEUDOCODE: ChatRoomMessageCreator Application Service
+Coordinates the creation of chat room messages with business logic
+"""
+
+CLASS ChatRoomMessageCreator:
+    # Dependencies
+    _creator: DomainChatRoomMessageCreator
+    _updater: DomainChatRoomMessageUpdater
+    _searcher: DomainChatRoomMessageSearcher
+    _chat_room_searcher: ChatRoomSearcher
+    _chat_room_creator: ChatRoomCreator
+    _event_bus: EventBus
+
+    CONSTRUCTOR(
+        creator: DomainChatRoomMessageCreator,
+        updater: DomainChatRoomMessageUpdater,
+        searcher: DomainChatRoomMessageSearcher,
+        chat_room_searcher: ChatRoomSearcher,
+        chat_room_creator: ChatRoomCreator,
+        event_bus: EventBus
+    ):
+        SET _creator = creator
+        SET _updater = updater
+        SET _searcher = searcher
+        SET _chat_room_searcher = chat_room_searcher
+        SET _chat_room_creator = chat_room_creator
+        SET _event_bus = event_bus
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION create(id: string, user_id: string, chat_room_id: string, content: string) -> void:
+        # First ensure the chat room exists
+        chat_room = AWAIT _chat_room_searcher.search(chat_room_id)
+
+        # Create chat room if it doesn't exist
+        IF chat_room IS NULL THEN
+            chat_room = AWAIT _chat_room_creator.create(chat_room_id, user_id)
+        END IF
+
+        # Check if message already exists
+        chat_room_message = AWAIT _searcher.search(id)
+
+        # Create new message or update existing one
+        IF chat_room_message IS NULL THEN
+            chat_room_message = AWAIT _creator.create(id, user_id, chat_room_id, content)
+        ELSE
+            AWAIT _updater.update(chat_room_message, content)
+        END IF
+    END FUNCTION
+END CLASS 

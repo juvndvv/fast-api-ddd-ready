@@ -1,0 +1,16 @@
+"""
+PSEUDOCODE: ChatRoomMessageSender Value Object and Enum
+Represents who sent the chat room message (user or assistant)
+"""
+
+ENUM ChatRoomMessageSenderType:
+    USER = "user"
+    ASSISTANT = "assistant"
+END ENUM
+
+CLASS ChatRoomMessageSender extends EnumValueObject[ChatRoomMessageSenderType]:
+    # This value object inherits all functionality from EnumValueObject
+    # It validates that the sender type is one of the valid enum values
+    # Provides string conversion and comparison methods
+    # Ensures type safety for sender identification
+END CLASS 

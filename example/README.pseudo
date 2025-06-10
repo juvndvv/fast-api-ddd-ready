@@ -1,0 +1,149 @@
+"""
+PSEUDOCODE CONVERSION - CHAT CONTEXT
+=====================================
+
+This directory contains the complete pseudocode conversion of the Chat context
+from the original Python codebase, maintaining the exact folder structure.
+
+STRUCTURE OVERVIEW:
+==================
+
+app/contexts/chat/
+├── chat_room/                           # Chat Room Bounded Context
+│   ├── application/                     # Application Layer
+│   │   ├── create/
+│   │   │   └── ChatRoomCreator.pseudo   # Application Service for Creation
+│   │   └── search/
+│   │       └── ChatRoomSearcher.pseudo  # Application Service for Searching
+│   ├── domain/                          # Domain Layer
+│   │   ├── ChatRoom.pseudo              # Aggregate Root Entity
+│   │   ├── ChatRoomId.pseudo            # UUID Value Object
+│   │   ├── ChatRoomUserId.pseudo        # Integer Value Object
+│   │   ├── ChatRoomCreatedAt.pseudo     # DateTime Value Object
+│   │   ├── ChatRoomRepository.pseudo    # Repository Interface
+│   │   ├── DomainChatRoomCreator.pseudo # Domain Service for Creation
+│   │   └── DomainChatRoomSearcher.pseudo# Domain Service for Searching
+│   └── infrastructure/                  # Infrastructure Layer
+│       ├── ChatRoomModule.pseudo        # Dependency Injection Configuration
+│       └── repository/
+│           └── MySqlChatRoomRepository.pseudo # MySQL Implementation
+│
+├── chat_room_message/                   # Chat Room Message Bounded Context
+│   ├── application/                     # Application Layer
+│   │   ├── create/
+│   │   │   ├── ChatRoomMessageCreator.pseudo       # Application Service
+│   │   │   ├── CreateChatRoomMessageCommand.pseudo # Command Object
+│   │   │   └── CreateChatRoomMessageCommandHandler.pseudo # Command Handler
+│   │   └── search/
+│   │       └── ChatRoomMessageSearcher.pseudo # Application Search Service
+│   ├── domain/                          # Domain Layer
+│   │   ├── ChatRoomMessage.pseudo       # Aggregate Root Entity
+│   │   ├── ChatRoomMessageId.pseudo     # UUID Value Object
+│   │   ├── ChatRoomMessageContent.pseudo # String Value Object
+│   │   ├── ChatRoomMessageSender.pseudo # Enum Value Object
+│   │   ├── ChatRoomMessageRepository.pseudo # Repository Interface
+│   │   ├── DomainChatRoomMessageCreator.pseudo # Domain Creation Service
+│   │   ├── DomainChatRoomMessageSearcher.pseudo # Domain Search Service
+│   │   └── DomainChatRoomMessageUpdater.pseudo # Domain Update Service
+│   └── infrastructure/                  # Infrastructure Layer
+│       ├── ChatRoomMessageModule.pseudo # Dependency Injection Configuration
+│       └── repository/
+│           └── MySqlChatRoomMessageRepository.pseudo # MySQL Implementation with AI
+│
+tests/contexts/chat/                     # Test Layer
+├── chat_room/
+│   └── domain/
+│       ├── test_chat_room.pseudo        # Entity Tests
+│       └── test_domain_chat_room_creator.pseudo # Domain Service Tests
+└── chat_room_message/
+    └── domain/
+        └── (additional test files...)
+
+ARCHITECTURAL PATTERNS:
+======================
+
+1. HEXAGONAL ARCHITECTURE (Ports & Adapters)
+   - Domain layer is isolated from external concerns
+   - Infrastructure adapters implement domain interfaces
+   - Application layer orchestrates use cases
+
+2. DOMAIN-DRIVEN DESIGN (DDD)  
+   - Aggregate Roots: ChatRoom, ChatRoomMessage
+   - Value Objects: ID, Content, Sender, CreatedAt, UserId
+   - Domain Services: Creator, Searcher, Updater
+   - Repository Pattern for persistence abstraction
+
+3. CQRS (Command Query Responsibility Segregation)
+   - Commands: CreateChatRoomMessageCommand
+   - Command Handlers: CreateChatRoomMessageCommandHandler
+   - Separate read/write operations
+
+4. DEPENDENCY INJECTION
+   - Module configuration for service mappings
+   - Constructor injection pattern throughout
+
+KEY FEATURES REPRESENTED:
+========================
+
+1. CHAT ROOM MANAGEMENT
+   - Creation with timestamp tracking
+   - User association
+   - Persistence with tenant isolation
+
+2. MESSAGE HANDLING  
+   - User and AI assistant messages
+   - Content management and updates
+   - Conversation history tracking
+   - AI integration (Yulia service)
+
+3. PERSISTENCE LAYER
+   - MySQL implementations
+   - Criteria-based searching
+   - Tenant isolation (multi-tenancy)
+   - Database connection management
+
+4. TESTING APPROACH
+   - Unit tests with mocking
+   - Domain logic verification
+   - Given-When-Then structure
+   - Behavior-driven test descriptions
+
+PSEUDOCODE CONVENTIONS:
+======================
+
+- CLASS/INTERFACE/ENUM: Define types
+- CONSTRUCTOR: Object initialization  
+- FUNCTION/ASYNC FUNCTION: Methods
+- PROPERTY: Getter methods
+- STATIC FUNCTION: Class methods
+- SET/GET: Variable assignment/access
+- IF/THEN/ELSE/END IF: Conditionals
+- FOR EACH/END FOR: Iterations  
+- AWAIT: Asynchronous operations
+- MOCK/VERIFY: Test operations
+- ASSERT: Test assertions
+
+BUSINESS LOGIC HIGHLIGHTS:
+=========================
+
+1. Message Creation Flow:
+   - Check if chat room exists, create if needed
+   - Save user message
+   - Send to AI service (Yulia)
+   - Save AI response
+   - Return AI response
+
+2. Chat Room Lifecycle:
+   - UUID-based identification
+   - User ownership tracking
+   - Timestamp management via Clock service
+
+3. Multi-tenancy:
+   - Tenant isolation in database queries
+   - Session context for current tenant
+   - Filtered data access
+
+This pseudocode conversion maintains the original architecture while
+making the business logic and technical patterns clearly visible
+through structured, language-agnostic representations.
+""" 

@@ -1,0 +1,53 @@
+"""
+PSEUDOCODE: DomainChatRoomMessageSearcher Domain Service
+Handles searching for chat room messages in the domain layer
+"""
+
+CLASS DomainChatRoomMessageSearcher:
+    # Dependencies
+    repository: ChatRoomMessageRepository
+    logger: Logger
+
+    CONSTRUCTOR(repository: ChatRoomMessageRepository, logger: Logger):
+        SET this.repository = repository
+        SET this.logger = logger
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION search(id: string) -> Optional[ChatRoomMessage]:
+        # Log the search operation
+        logger.info("Searching for ChatRoomMessage with id: " + id)
+
+        # Search in repository
+        search_result = AWAIT repository.search(id)
+
+        # Handle not found case
+        IF search_result IS NULL THEN
+            logger.info("ChatRoomMessage with id " + id + " not found")
+            RETURN NULL
+        END IF
+
+        # Log successful search
+        logger.info("Found ChatRoomMessage: " + search_result.to_primitives())
+
+        RETURN search_result
+    END FUNCTION
+
+    ASYNC FUNCTION matches(criteria: Criteria) -> List[ChatRoomMessage]:
+        # Log the search operation
+        logger.info("Searching for ChatRoomMessages with criteria: " + criteria)
+
+        # Search in repository
+        search_result = AWAIT repository.matches(criteria)
+
+        # Handle empty results
+        IF search_result IS NULL THEN
+            logger.info("No ChatRoomMessages found with criteria: " + criteria)
+            RETURN empty_list
+        END IF
+
+        # Log successful search
+        logger.info("Found " + search_result.length + " ChatRoomMessages")
+
+        RETURN search_result
+    END FUNCTION
+END CLASS 

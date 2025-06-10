@@ -1,0 +1,60 @@
+"""
+PSEUDOCODE: DomainChatRoomCreator Tests
+Unit tests for the DomainChatRoomCreator domain service
+"""
+
+TEST_SUITE DomainChatRoomCreatorTests:
+
+    TEST test_domain_chat_room_creator_create:
+        # Test that verifies the creation of a ChatRoom using DomainChatRoomCreator
+
+        # Given: mocked dependencies and test data
+        repository_mock = create_mock(ChatRoomRepository)
+        clock_mock = create_mock(Clock)
+        
+        # Configure mocks
+        MOCK clock_mock.now() RETURNS "2024-03-20T10:00:00"
+        MOCK repository_mock.save() RETURNS async_success
+        
+        # Create domain creator with mocks
+        domain_creator = DomainChatRoomCreator(repository_mock, clock_mock)
+        chat_room_id = "123e4567-e89b-12d3-a456-426614174000"
+        user_id = 123
+
+        # When: creating a chat room
+        AWAIT domain_creator.create(chat_room_id, user_id)
+
+        # Then: the repository save is called with the correct chat room
+        VERIFY repository_mock.save() WAS_CALLED_ONCE
+        saved_chat_room = GET_FIRST_ARGUMENT_FROM repository_mock.save()
+        
+        ASSERT saved_chat_room.id EQUALS chat_room_id
+        ASSERT saved_chat_room.user_id EQUALS user_id
+        ASSERT saved_chat_room.created_at EQUALS "2024-03-20T10:00:00"
+    END TEST
+
+    TEST test_domain_chat_room_creator_uses_clock:
+        # Test that verifies the creator uses the clock service for timestamps
+
+        # Given: mocked dependencies
+        repository_mock = create_mock(ChatRoomRepository)
+        clock_mock = create_mock(Clock)
+        expected_time = "2024-12-01T15:30:45"
+        
+        # Configure clock mock
+        MOCK clock_mock.now() RETURNS expected_time
+        MOCK repository_mock.save() RETURNS async_success
+        
+        domain_creator = DomainChatRoomCreator(repository_mock, clock_mock)
+
+        # When: creating a chat room
+        AWAIT domain_creator.create("test-id", 456)
+
+        # Then: the clock service is used
+        VERIFY clock_mock.now() WAS_CALLED_ONCE
+        
+        saved_chat_room = GET_FIRST_ARGUMENT_FROM repository_mock.save()
+        ASSERT saved_chat_room.created_at EQUALS expected_time
+    END TEST
+
+END TEST_SUITE 

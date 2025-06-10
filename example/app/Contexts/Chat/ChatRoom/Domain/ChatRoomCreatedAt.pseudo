@@ -1,0 +1,11 @@
+"""
+PSEUDOCODE: ChatRoomCreatedAt Value Object
+Represents the timestamp when a chat room was created
+"""
+
+CLASS ChatRoomCreatedAt extends DateTimeValueObject:
+    # This value object inherits all functionality from DateTimeValueObject
+    # It validates that the timestamp is a valid datetime
+    # Provides datetime conversion and comparison methods
+    # Supports ISO string format for serialization
+END CLASS 

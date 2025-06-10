@@ -1,0 +1,11 @@
+"""
+PSEUDOCODE: ChatRoomMessageContent Value Object
+Represents the content/text of a chat room message
+"""
+
+CLASS ChatRoomMessageContent extends StringValueObject:
+    # This value object inherits all functionality from StringValueObject
+    # It validates that the content is a valid string
+    # Provides string conversion and comparison methods
+    # May include content validation rules (length, format, etc.)
+END CLASS 

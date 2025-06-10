@@ -1,0 +1,22 @@
+"""
+PSEUDOCODE: ChatRoomRepository Interface
+Defines the contract for chat room persistence operations
+"""
+
+INTERFACE ChatRoomRepository:
+    # Persistence operations
+    ABSTRACT ASYNC FUNCTION save(chat_room: ChatRoom) -> ChatRoom:
+        # Saves a chat room to the persistence layer
+        # Returns the saved chat room
+    END FUNCTION
+
+    ABSTRACT ASYNC FUNCTION search(id: string) -> Optional[ChatRoom]:
+        # Searches for a chat room by its unique ID
+        # Returns the chat room if found, null otherwise
+    END FUNCTION
+
+    ABSTRACT ASYNC FUNCTION matches(criteria: Criteria) -> List[ChatRoom]:
+        # Searches for chat rooms that match the given criteria
+        # Returns a list of matching chat rooms (empty list if none found)
+    END FUNCTION
+END INTERFACE 

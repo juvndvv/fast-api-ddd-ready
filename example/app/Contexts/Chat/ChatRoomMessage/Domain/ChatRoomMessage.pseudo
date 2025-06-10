@@ -1,0 +1,61 @@
+"""
+PSEUDOCODE: ChatRoomMessage Aggregate Root Entity
+Represents a chat message in a chat room
+"""
+
+CLASS ChatRoomMessage extends AggregateRoot:
+    # Private attributes
+    _id: ChatRoomMessageId
+    _chat_room_id: ChatRoomMessageId
+    _sender: ChatRoomMessageSender 
+    _content: ChatRoomMessageContent
+
+    CONSTRUCTOR(id: string, chat_room_id: string, sender: ChatRoomMessageSenderType, content: string):
+        SET _id = ChatRoomMessageId(id)
+        SET _chat_room_id = ChatRoomMessageId(chat_room_id)
+        SET _sender = ChatRoomMessageSender(sender)
+        SET _content = ChatRoomMessageContent(content)
+
+    # Access properties
+    PROPERTY id -> string:
+        RETURN _id.to_string()
+
+    PROPERTY chat_room_id -> string:
+        RETURN _chat_room_id.to_string()
+
+    PROPERTY sender -> string:
+        RETURN string_from(_sender)
+
+    PROPERTY content -> string:
+        RETURN string_from(_content)
+
+    # Business methods
+    FUNCTION update_content(content: string) -> boolean:
+        IF this.content EQUALS content THEN
+            RETURN FALSE
+        END IF
+        
+        SET _content = ChatRoomMessageContent(content)
+        RETURN TRUE
+
+    # Static creation methods
+    STATIC FUNCTION create(id: string, chat_room_id: string, sender: ChatRoomMessageSenderType, content: string) -> ChatRoomMessage:
+        RETURN new_instance(id, chat_room_id, sender, content)
+
+    STATIC FUNCTION create_from_assistant(id: string, chat_room_id: string, content: string) -> ChatRoomMessage:
+        RETURN new_instance(id, chat_room_id, ChatRoomMessageSenderType.ASSISTANT, content)
+    
+    STATIC FUNCTION create_from_user(id: string, chat_room_id: string, content: string) -> ChatRoomMessage:
+        RETURN new_instance(id, chat_room_id, ChatRoomMessageSenderType.USER, content)
+    
+    STATIC FUNCTION from_primitives(id: string, chat_room_id: string, sender: string, content: string) -> ChatRoomMessage:
+        RETURN new_instance(id, chat_room_id, ChatRoomMessageSenderType(sender), content)
+
+    # Serialization
+    FUNCTION to_primitives() -> dictionary:
+        RETURN dictionary with:
+            "id": id
+            "chat_room_id": chat_room_id
+            "sender": sender
+            "content": content
+END CLASS 

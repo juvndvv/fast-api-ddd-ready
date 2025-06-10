@@ -1,0 +1,26 @@
+"""
+PSEUDOCODE: DomainChatRoomCreator Domain Service
+Handles the creation of chat rooms in the domain layer
+"""
+
+CLASS DomainChatRoomCreator:
+    # Dependencies
+    _repository: ChatRoomRepository
+    _clock: Clock
+
+    CONSTRUCTOR(repository: ChatRoomRepository, clock: Clock):
+        SET _repository = repository
+        SET _clock = clock
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION create(id: string, user_id: integer) -> void:
+        # Get current timestamp
+        created_at = _clock.now()
+        
+        # Create the chat room entity
+        chat_room = ChatRoom.create(id, user_id, created_at)
+        
+        # Save to repository
+        AWAIT _repository.save(chat_room)
+    END FUNCTION
+END CLASS 

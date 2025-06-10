@@ -1,0 +1,31 @@
+"""
+PSEUDOCODE: DomainChatRoomMessageCreator Domain Service
+Handles the creation of chat room messages in the domain layer
+"""
+
+CLASS DomainChatRoomMessageCreator:
+    # Dependencies
+    _repository: ChatRoomMessageRepository
+    _logger: Logger
+
+    CONSTRUCTOR(repository: ChatRoomMessageRepository, logger: Logger):
+        SET _repository = repository
+        SET _logger = logger
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION create(id: string, user_id: string, chat_room_id: string, content: string) -> ChatRoomMessage:
+        # Log the creation process
+        _logger.info("Creating ChatRoomMessage with id: " + id + ", chat_room_id: " + chat_room_id + ", user_id: " + user_id)
+        
+        # Create the chat room message entity
+        chat_room_message = ChatRoomMessage.create_from_user(id, chat_room_id, content)
+        
+        # Save to repository
+        AWAIT _repository.save(chat_room_message)
+        
+        # Log successful creation
+        _logger.info("Saved ChatRoomMessage: " + chat_room_message.to_primitives())
+        
+        RETURN chat_room_message
+    END FUNCTION
+END CLASS 

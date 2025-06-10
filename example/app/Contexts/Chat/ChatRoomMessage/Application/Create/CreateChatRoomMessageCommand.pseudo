@@ -1,0 +1,19 @@
+"""
+PSEUDOCODE: CreateChatRoomMessageCommand
+Command object that encapsulates the data needed to create a chat room message
+"""
+
+CLASS CreateChatRoomMessageCommand extends Command:
+    # Command data
+    id: string
+    user_id: integer
+    chat_room_id: string
+    content: string
+
+    CONSTRUCTOR(id: string, user_id: integer, chat_room_id: string, content: string):
+        SET this.id = id
+        SET this.user_id = user_id
+        SET this.chat_room_id = chat_room_id
+        SET this.content = content
+    END CONSTRUCTOR
+END CLASS 

@@ -1,0 +1,66 @@
+"""
+PSEUDOCODE: ChatRoom Domain Tests
+Unit tests for the ChatRoom aggregate root entity
+"""
+
+TEST_SUITE ChatRoomTests:
+
+    TEST test_chat_room_creation:
+        # Given: valid test data
+        id = "123e4567-e89b-12d3-a456-426614174000"
+        user_id = 123
+        created_at = current_datetime()
+
+        # When: creating a ChatRoom
+        chat_room = ChatRoom.create(id, user_id, created_at)
+
+        # Then: the chat room has the expected values
+        ASSERT chat_room.id EQUALS id
+        ASSERT chat_room.user_id EQUALS user_id
+        ASSERT chat_room.created_at EQUALS created_at.to_iso_string()
+    END TEST
+
+    TEST test_chat_room_creation_with_string_date:
+        # Given: valid test data with string date
+        id = "123e4567-e89b-12d3-a456-426614174000"
+        user_id = 123
+        created_at = "2024-03-20T10:00:00"
+
+        # When: creating a ChatRoom with string date
+        chat_room = ChatRoom.create(id, user_id, created_at)
+
+        # Then: the chat room is created successfully
+        ASSERT chat_room.id EQUALS id
+        ASSERT chat_room.user_id EQUALS user_id
+        ASSERT chat_room.created_at EQUALS created_at
+    END TEST
+
+    TEST test_chat_room_from_primitives:
+        # Given: primitive data
+        id = "123e4567-e89b-12d3-a456-426614174000"
+        user_id = 123
+        created_at = "2024-03-20T10:00:00"
+
+        # When: creating from primitives
+        chat_room = ChatRoom.from_primitives(id, user_id, created_at)
+
+        # Then: the chat room is created correctly
+        ASSERT chat_room.id EQUALS id
+        ASSERT chat_room.user_id EQUALS user_id
+        ASSERT chat_room.created_at EQUALS created_at
+    END TEST
+
+    TEST test_chat_room_to_primitives:
+        # Given: a chat room
+        chat_room = ChatRoom.create("123e4567-e89b-12d3-a456-426614174000", 123, "2024-03-20T10:00:00")
+
+        # When: converting to primitives
+        primitives = chat_room.to_primitives()
+
+        # Then: the primitives contain the expected data
+        ASSERT primitives["id"] EQUALS "123e4567-e89b-12d3-a456-426614174000"
+        ASSERT primitives["user_id"] EQUALS "123"
+        ASSERT primitives["created_at"] EQUALS "2024-03-20T10:00:00"
+    END TEST
+
+END TEST_SUITE 

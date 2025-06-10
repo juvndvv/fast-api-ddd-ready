@@ -1,0 +1,114 @@
+"""
+PSEUDOCODE: MySqlChatRoomMessageRepository
+MySQL implementation of the ChatRoomMessageRepository interface
+Handles persistence and retrieval of chat room messages with AI integration
+"""
+
+CLASS MySqlChatRoomMessageRepository implements ChatRoomMessageRepository:
+    # Dependencies
+    db_connection: DatabaseConnection
+    session: SessionContext
+    yulia: Yulia
+    converter: CriteriaToSqlConverter
+
+    CONSTRUCTOR(db_connection: DatabaseConnection, session: SessionContext, yulia: Yulia):
+        SET this.db_connection = db_connection
+        SET this.session = session
+        SET this.yulia = yulia
+        SET this.converter = CriteriaToSqlConverter("ai_conversation_messages")
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION search(id: string) -> Optional[ChatRoomMessage]:
+        # Build SQL query to find message by ID
+        query = "SELECT * FROM ai_conversation_messages WHERE uuid = ?"
+        
+        # Execute query
+        result = AWAIT db_connection.fetch_one(query, [id])
+        
+        # Return null if not found
+        IF result IS NULL THEN
+            RETURN NULL
+        END IF
+        
+        # Convert database row to domain entity
+        RETURN ChatRoomMessage.from_primitives(
+            id = result["uuid"],
+            chat_room_id = result["conversation_id"],
+            content = result["content"],
+            sender = result["role"]
+        )
+    END FUNCTION
+
+    ASYNC FUNCTION save(chat_room_message: ChatRoomMessage) -> ChatRoomMessage:
+        # Convert domain entity to primitives
+        primitives = chat_room_message.to_primitives()
+
+        # Get conversation history for AI context
+        history_criteria = Criteria with filter:
+            field = "conversation_id"
+            operator = EQUAL
+            value = primitives["chat_room_id"]
+        
+        history = AWAIT this.matches(history_criteria)
+
+        # Send message to AI service for processing
+        ai_response = AWAIT yulia.send(chat_room_message, history)
+
+        # Create AI response message
+        response_message = ChatRoomMessage.create_from_assistant(
+            id = generate_uuid(),
+            chat_room_id = primitives["chat_room_id"],
+            content = ai_response
+        )
+
+        # Save both user message and AI response
+        AWAIT this.save_message(primitives)
+        AWAIT this.save_message(response_message.to_primitives())
+
+        RETURN response_message
+    END FUNCTION
+
+    ASYNC FUNCTION matches(criteria: Criteria) -> List[ChatRoomMessage]:
+        # Convert criteria to SQL query
+        query, params = converter.convert(criteria)
+        
+        # Execute query
+        results = AWAIT db_connection.fetch_all(query, params)
+        
+        # Convert each row to domain entity
+        messages = empty_list
+        FOR EACH row IN results:
+            message = ChatRoomMessage.from_primitives(
+                id = row["uuid"],
+                chat_room_id = row["conversation_id"],
+                content = row["content"],
+                sender = row["role"]
+            )
+            ADD message TO messages
+        END FOR
+        
+        RETURN messages
+    END FUNCTION
+
+    ASYNC FUNCTION save_message(primitives: dictionary) -> void:
+        # Build insert query with tenant isolation
+        query = """
+            INSERT INTO ai_conversation_messages 
+            (uuid, conversation_id, customer_id, content, role, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """
+        
+        # Prepare parameters including tenant ID from session
+        params = [
+            primitives["id"],
+            primitives["chat_room_id"],
+            session.get_tenant_id(),
+            primitives["content"],
+            primitives["sender"],
+            current_timestamp()
+        ]
+        
+        # Execute insert
+        AWAIT db_connection.execute(query, params)
+    END FUNCTION
+END CLASS 

@@ -1,0 +1,38 @@
+"""
+PSEUDOCODE: ChatRoomSearcher Application Service
+Handles searching for chat rooms and converting them to primitives
+"""
+
+CLASS ChatRoomSearcher:
+    # Dependencies
+    domain_searcher: DomainChatRoomSearcher
+
+    CONSTRUCTOR(domain_searcher: DomainChatRoomSearcher):
+        SET this.domain_searcher = domain_searcher
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION search(id: string) -> Optional[dictionary]:
+        # Search for the chat room using domain service
+        search_result = AWAIT domain_searcher.search(id)
+        
+        # Convert to primitives or return null
+        IF search_result IS NOT NULL THEN
+            RETURN search_result.to_primitives()
+        ELSE
+            RETURN NULL
+        END IF
+    END FUNCTION
+
+    ASYNC FUNCTION matches(criteria: Criteria) -> List[dictionary]:
+        # Search for chat rooms matching criteria
+        search_results = AWAIT domain_searcher.matches(criteria)
+        
+        # Convert all results to primitives
+        primitive_results = empty_list
+        FOR EACH chat_room IN search_results:
+            ADD chat_room.to_primitives() TO primitive_results
+        END FOR
+        
+        RETURN primitive_results
+    END FUNCTION
+END CLASS 

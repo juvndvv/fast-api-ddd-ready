@@ -1,0 +1,18 @@
+"""
+PSEUDOCODE: CreateChatRoomMessageCommandHandler
+Handles the CreateChatRoomMessageCommand by orchestrating the creation process
+"""
+
+CLASS CreateChatRoomMessageCommandHandler extends CommandHandler[CreateChatRoomMessageCommand]:
+    # Dependencies
+    creator: ChatRoomMessageCreator
+
+    CONSTRUCTOR(creator: ChatRoomMessageCreator):
+        SET this.creator = creator
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION handle(command: CreateChatRoomMessageCommand) -> void:
+        # Delegate the creation to the application service
+        AWAIT creator.create(command.id, command.user_id, command.chat_room_id, command.content)
+    END FUNCTION
+END CLASS 

@@ -1,0 +1,10 @@
+"""
+PSEUDOCODE: ChatRoomId Value Object
+Represents a unique identifier for chat rooms (UUID)
+"""
+
+CLASS ChatRoomId extends UUIDValueObject:
+    # This value object inherits all functionality from UUIDValueObject
+    # It validates that the ID is a valid UUID format
+    # Provides string conversion and comparison methods
+END CLASS 

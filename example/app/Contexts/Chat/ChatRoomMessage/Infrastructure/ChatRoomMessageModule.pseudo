@@ -1,0 +1,41 @@
+"""
+PSEUDOCODE: ChatRoomMessageModule Configuration
+Defines the dependency injection mappings for the chat room message context
+"""
+
+IMPORT logging
+IMPORT Binder, Module from injector
+
+CLASS ChatRoomMessageModule extends Module:
+    
+    PROPERTY _logger: logging.Logger = logging.getLogger(__name__)
+    
+    FUNCTION configure(binder: Binder) -> None:
+        # Log module configuration
+        CALL _logger.info("Configuring chat room message module")
+        
+        # Bind service interfaces to concrete implementations
+        CALL binder.bind(ChatRoomMessageRepository, to=MySqlChatRoomMessageRepository)
+        
+        # Additional bindings can be added here
+    END FUNCTION
+
+    FUNCTION map_commands() -> List[tuple[type[Command], type[CommandHandler]]]:
+        # Maps command classes to command handlers
+        RETURN list_of_mappings:
+            (CreateChatRoomMessageCommand, CreateChatRoomMessageCommandHandler)
+        END RETURN
+    END FUNCTION
+
+    FUNCTION map_queries() -> List[tuple[type[Query], type[QueryHandler]]]:
+        # Maps query classes to query handlers
+        # Currently empty - no query handlers defined
+        RETURN empty_list
+    END FUNCTION
+
+    FUNCTION map_events() -> List[tuple[type[DomainEvent], type[EventListener]]]:
+        # Maps domain events to event listeners
+        # Currently empty - no event listeners defined
+        RETURN empty_list
+    END FUNCTION
+END CLASS 

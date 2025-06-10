@@ -1,0 +1,34 @@
+"""
+PSEUDOCODE: DomainChatRoomMessageUpdater Domain Service
+Handles updating chat room messages in the domain layer
+"""
+
+CLASS DomainChatRoomMessageUpdater:
+    # Dependencies
+    repository: ChatRoomMessageRepository
+    logger: Logger
+
+    CONSTRUCTOR(repository: ChatRoomMessageRepository, logger: Logger):
+        SET this.repository = repository
+        SET this.logger = logger
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION update(chat_room_message: ChatRoomMessage, content: string) -> boolean:
+        # Log the update operation
+        logger.info("Updating ChatRoomMessage with id: " + chat_room_message.id)
+
+        # Update the message content
+        is_updated = chat_room_message.update_content(content)
+
+        # Check if update was necessary
+        IF NOT is_updated THEN
+            logger.info("ChatRoomMessage with id " + chat_room_message.id + " not updated")
+            RETURN FALSE
+        END IF
+
+        # Save the updated message
+        AWAIT repository.save(chat_room_message)
+
+        RETURN TRUE
+    END FUNCTION
+END CLASS 

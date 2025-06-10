@@ -1,0 +1,22 @@
+"""
+PSEUDOCODE: ChatRoomMessageRepository Interface
+Defines the contract for chat room message persistence operations
+"""
+
+INTERFACE ChatRoomMessageRepository:
+    # Persistence operations
+    ABSTRACT ASYNC FUNCTION save(chat_room_message: ChatRoomMessage) -> ChatRoomMessage:
+        # Saves a chat room message to the persistence layer
+        # Returns the saved message
+    END FUNCTION
+
+    ABSTRACT ASYNC FUNCTION search(id: string) -> Optional[ChatRoomMessage]:
+        # Searches for a chat room message by its unique ID
+        # Returns the message if found, null otherwise
+    END FUNCTION
+
+    ABSTRACT ASYNC FUNCTION matches(criteria: Criteria) -> List[ChatRoomMessage]:
+        # Searches for chat room messages that match the given criteria
+        # Returns a list of matching messages (empty list if none found)
+    END FUNCTION
+END INTERFACE 

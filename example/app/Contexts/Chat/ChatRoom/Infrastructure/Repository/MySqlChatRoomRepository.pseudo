@@ -1,0 +1,86 @@
+"""
+PSEUDOCODE: MySqlChatRoomRepository
+MySQL implementation of the ChatRoomRepository interface
+Handles persistence and retrieval of chat rooms
+"""
+
+CLASS MySqlChatRoomRepository implements ChatRoomRepository:
+    # Dependencies
+    db_connection: DatabaseConnection
+    session: SessionContext
+    converter: CriteriaToSqlConverter
+
+    CONSTRUCTOR(db_connection: DatabaseConnection, session: SessionContext):
+        SET this.db_connection = db_connection
+        SET this.session = session
+        SET this.converter = CriteriaToSqlConverter("ai_conversations")
+    END CONSTRUCTOR
+
+    ASYNC FUNCTION search(id: string) -> Optional[ChatRoom]:
+        # Build SQL query to find chat room by ID
+        query = "SELECT * FROM ai_conversations WHERE uuid = ? AND customer_id = ?"
+        
+        # Execute query with tenant isolation
+        result = AWAIT db_connection.fetch_one(query, [id, session.get_tenant_id()])
+        
+        # Return null if not found
+        IF result IS NULL THEN
+            RETURN NULL
+        END IF
+        
+        # Convert database row to domain entity
+        RETURN ChatRoom.from_primitives(
+            id = result["uuid"],
+            user_id = result["customer_id"],
+            created_at = result["created_at"]
+        )
+    END FUNCTION
+
+    ASYNC FUNCTION save(chat_room: ChatRoom) -> ChatRoom:
+        # Convert domain entity to primitives
+        primitives = chat_room.to_primitives()
+
+        # Build insert/update query with tenant isolation
+        query = """
+            INSERT INTO ai_conversations (uuid, customer_id, created_at)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE created_at = VALUES(created_at)
+        """
+        
+        # Prepare parameters
+        params = [
+            primitives["id"],
+            session.get_tenant_id(),
+            primitives["created_at"]
+        ]
+        
+        # Execute query
+        AWAIT db_connection.execute(query, params)
+        
+        RETURN chat_room
+    END FUNCTION
+
+    ASYNC FUNCTION matches(criteria: Criteria) -> List[ChatRoom]:
+        # Add tenant isolation to criteria
+        tenant_criteria = criteria.add_tenant_filter(session.get_tenant_id())
+        
+        # Convert criteria to SQL query
+        query, params = converter.convert(tenant_criteria)
+        
+        # Execute query
+        results = AWAIT db_connection.fetch_all(query, params)
+        
+        # Convert each row to domain entity
+        chat_rooms = empty_list
+        FOR EACH row IN results:
+            chat_room = ChatRoom.from_primitives(
+                id = row["uuid"],
+                user_id = row["customer_id"],
+                created_at = row["created_at"]
+            )
+            ADD chat_room TO chat_rooms
+        END FOR
+        
+        RETURN chat_rooms
+    END FUNCTION
+END CLASS 
