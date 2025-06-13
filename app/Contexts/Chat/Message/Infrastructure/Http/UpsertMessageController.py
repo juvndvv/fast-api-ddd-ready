@@ -3,10 +3,10 @@ from typing import Any
 
 from fastapi import APIRouter, Response, status
 
-from app.Contexts.Chat.Conversation.Application.Create.UpsertMessageCommand import (
+from app.Contexts.Chat.Message.Application.Create.UpsertMessageCommand import (
     UpsertMessageCommand,
 )
-from app.Contexts.Chat.Conversation.Application.Create.UpsertMessageCommandHandler import (
+from app.Contexts.Chat.Message.Application.Create.UpsertMessageCommandHandler import (
     UpsertMessageCommandHandler,
 )
 from app.Contexts.Shared.Infrastructure.Http.Controller import Controller

@@ -2,17 +2,17 @@ from unittest.mock import Mock
 
 import pytest
 
-from app.Contexts.Chat.Conversation.Application.Create.UpsertMessageCommand import (
-    UpsertMessageCommand,
-)
-from app.Contexts.Chat.Conversation.Application.Create.UpsertMessageCommandHandler import (
-    UpsertMessageCommandHandler,
-)
 from app.Contexts.Chat.Conversation.Domain.Conversation import Conversation
 from app.Contexts.Chat.Conversation.Domain.ConversationId import ConversationId
 from app.Contexts.Chat.Conversation.Domain.ConversationOwner import ConversationOwner
 from app.Contexts.Chat.Conversation.Infrastructure.Repository.ConversationRepository import (
     ConversationRepository,
+)
+from app.Contexts.Chat.Message.Application.Create.UpsertMessageCommand import (
+    UpsertMessageCommand,
+)
+from app.Contexts.Chat.Message.Application.Create.UpsertMessageCommandHandler import (
+    UpsertMessageCommandHandler,
 )
 from app.Contexts.Chat.Message.Domain.Message import Message
 from app.Contexts.Chat.Message.Domain.MessageChronologyChecker import (

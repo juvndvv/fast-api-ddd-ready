@@ -3,10 +3,10 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from fastapi import status
 
-from app.Contexts.Chat.Conversation.Application.Create.UpsertMessageCommand import (
+from app.Contexts.Chat.Message.Application.Create.UpsertMessageCommand import (
     UpsertMessageCommand,
 )
-from app.Contexts.Chat.Conversation.Application.Create.UpsertMessageCommandHandler import (
+from app.Contexts.Chat.Message.Application.Create.UpsertMessageCommandHandler import (
     UpsertMessageCommandHandler,
 )
 from app.Contexts.Chat.Message.Infrastructure.Http.UpsertMessageController import (
