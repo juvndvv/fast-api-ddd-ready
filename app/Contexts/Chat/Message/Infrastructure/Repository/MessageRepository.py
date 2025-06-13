@@ -29,3 +29,10 @@ class MessageRepository(ABC):
     def soft_delete_messages(self, message_ids: list[MessageId]) -> None:
         """Marca como eliminados (soft delete) una lista de mensajes"""
         pass
+
+    @abstractmethod
+    def paginate_messages(
+        self, conversation_id: ConversationId, cursor: str | None, limit: int
+    ) -> list[Message]:
+        """Pagina mensajes de una conversación usando cursor"""
+        pass
