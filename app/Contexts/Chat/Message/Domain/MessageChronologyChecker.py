@@ -1,3 +1,5 @@
+from injector import inject
+
 from app.Contexts.Chat.Conversation.Domain.ConversationId import ConversationId
 from app.Contexts.Chat.Message.Domain.MessageId import MessageId
 from app.Contexts.Chat.Message.Infrastructure.Repository.MessageRepository import (
@@ -8,6 +10,7 @@ from app.Contexts.Chat.Message.Infrastructure.Repository.MessageRepository impor
 class MessageChronologyChecker:
     """Servicio de dominio para verificar cronología de mensajes"""
 
+    @inject
     def __init__(self, message_repository: MessageRepository) -> None:
         self._message_repository = message_repository
 

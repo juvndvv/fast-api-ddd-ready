@@ -38,9 +38,11 @@ class ApplicationBootstrapper:
             self._modules = ClassFinder.find(Module, "Module")  # type: ignore[arg-type]
             self._initialize_injector()
             self._initialize_app()
+            self._initialize_middlewares()
             self._initialize_commands()
             self._initialize_queries()
             self._initialize_events()
+            self._initialize_controllers()
             self._initialized = True
 
     def _initialize_injector(self) -> None:
@@ -99,11 +101,35 @@ class ApplicationBootstrapper:
                 lifespan=self._lifespan,
             )
 
-            # Inicializar middlewares
-            self._logger.info("Initializing middlewares")
-            middlewares = ClassFinder.find(Middleware, "Middleware")  # type: ignore
-            for middleware_class in middlewares:
-                self._app.add_middleware(middleware_class)  # type: ignore
+    def _initialize_middlewares(self) -> None:
+        self._logger.info("Initializing middlewares")
+        if not self._app:
+            raise RuntimeError("FastAPI app not initialized")
+
+        middlewares = ClassFinder.find(Middleware, "Middleware")  # type: ignore
+        for middleware_class in middlewares:
+            self._app.add_middleware(middleware_class)  # type: ignore
+
+    def _initialize_controllers(self) -> None:
+        self._logger.info("Initializing controllers")
+        if not self._app or not self._injector:
+            raise RuntimeError("FastAPI app or injector not initialized")
+
+        controllers = ClassFinder.find(Controller, "Controller")  # type: ignore
+        for controller_class in controllers:
+            try:
+                controller = self._injector.get(controller_class)  # type: ignore
+                if not isinstance(controller, Controller):
+                    continue
+                self._app.include_router(controller.get_router())  # type: ignore
+                self._logger.info(
+                    f"Successfully registered controller: {controller_class.__name__}"
+                )
+            except Exception as e:
+                self._logger.warning(
+                    f"Failed to register controller {controller_class.__name__}: {e}"
+                )
+                # Continue with other controllers instead of failing
 
     @asynccontextmanager
     async def _lifespan(self, app: FastAPI) -> AsyncGenerator[None]:
@@ -134,17 +160,6 @@ class ApplicationBootstrapper:
         exception_handler_class = exception_handlers[0]
         exception_handler = self._injector.get(exception_handler_class)  # type: ignore
         self._app.add_exception_handler(BaseException, exception_handler.handle)  # type: ignore
-
-        # Initialize controllers
-        self._logger.info("Initializing controllers")
-        controllers = ClassFinder.find(Controller, "Controller")  # type: ignore
-        for controller_class in controllers:
-            controller = self._injector.get(controller_class)  # type: ignore
-
-            if not isinstance(controller, Controller):
-                continue
-
-            self._app.include_router(controller.get_router())  # type: ignore
 
     @property
     def app(self) -> FastAPI:

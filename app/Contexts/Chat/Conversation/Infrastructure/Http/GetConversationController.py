@@ -1,6 +1,7 @@
 import json
 
 from fastapi import APIRouter, Response, status
+from injector import inject
 
 from app.Contexts.Chat.Conversation.Application.Search.GetConversationQuery import (
     GetConversationQuery,
@@ -14,6 +15,7 @@ from app.Contexts.Shared.Infrastructure.Http.Controller import Controller
 class GetConversationController(Controller):
     """Controlador HTTP para obtener metadatos de conversación"""
 
+    @inject
     def __init__(self, query_handler: GetConversationQueryHandler) -> None:
         self._query_handler = query_handler
 
@@ -50,7 +52,7 @@ class GetConversationController(Controller):
         """Obtiene el router de la API para este controlador"""
         router = APIRouter()
         router.add_api_route(
-            "/conversation/{conversation_id}",
+            "/conversations/{conversation_id}",
             self.get_conversation,
             methods=["GET"],
             status_code=status.HTTP_200_OK,

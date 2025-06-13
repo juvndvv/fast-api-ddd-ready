@@ -1,3 +1,5 @@
+from injector import inject
+
 from app.Contexts.Chat.Conversation.Domain.Conversation import Conversation
 from app.Contexts.Chat.Conversation.Domain.ConversationId import ConversationId
 from app.Contexts.Chat.Conversation.Domain.ConversationOwner import ConversationOwner
@@ -27,6 +29,7 @@ from app.Contexts.Shared.Domain.AggregateRoot import AggregateRoot
 class UpsertMessageCommandHandler(CommandHandler):
     """Handler para el comando UpsertMessage que implementa la lógica de negocio atómica"""
 
+    @inject
     def __init__(
         self,
         conversation_repository: ConversationRepository,

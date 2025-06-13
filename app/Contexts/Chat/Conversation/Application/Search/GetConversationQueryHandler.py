@@ -1,5 +1,7 @@
 from typing import Any
 
+from injector import inject
+
 from app.Contexts.Chat.Conversation.Application.Search.GetConversationQuery import (
     GetConversationQuery,
 )
@@ -16,6 +18,7 @@ from app.Contexts.Shared.Application.Bus.Query.QueryHandler import QueryHandler
 class GetConversationQueryHandler(QueryHandler):
     """Handler para obtener metadatos de conversación sin consultar mensajes"""
 
+    @inject
     def __init__(
         self,
         conversation_repository: ConversationRepository,

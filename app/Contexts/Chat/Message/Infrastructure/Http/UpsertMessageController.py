@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 from fastapi import APIRouter, Response, status
+from injector import inject
 
 from app.Contexts.Chat.Message.Application.Create.UpsertMessageCommand import (
     UpsertMessageCommand,
@@ -15,6 +16,7 @@ from app.Contexts.Shared.Infrastructure.Http.Controller import Controller
 class UpsertMessageController(Controller):
     """Controlador HTTP para crear/actualizar mensajes en conversaciones"""
 
+    @inject
     def __init__(self, command_handler: UpsertMessageCommandHandler) -> None:
         self._command_handler = command_handler
 
@@ -53,7 +55,7 @@ class UpsertMessageController(Controller):
             await self._command_handler.handle(command)
 
             # AC1 & AC8: Respuesta exitosa (idempotente)
-            response_body = json.dumps({"message": "Message created successfully"})
+            response_body = json.dumps({"message": "Message upserted successfully"})
             return Response(
                 content=response_body,
                 status_code=status.HTTP_201_CREATED,
@@ -71,7 +73,7 @@ class UpsertMessageController(Controller):
         """Obtiene el router de la API para este controlador"""
         router = APIRouter()
         router.add_api_route(
-            "/conversation/{conversation_id}/message/{message_id}",
+            "/conversations/{conversation_id}/messages/{message_id}",
             self.upsert_message,
             methods=["PUT"],
             status_code=status.HTTP_201_CREATED,
