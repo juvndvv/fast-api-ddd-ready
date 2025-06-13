@@ -1,5 +1,7 @@
 from typing import Any
 
+from injector import inject
+
 from app.Contexts.Chat.Conversation.Domain.ConversationId import ConversationId
 from app.Contexts.Chat.Message.Application.Search.PaginateMessagesQuery import (
     PaginateMessagesQuery,
@@ -13,6 +15,7 @@ from app.Contexts.Shared.Application.Bus.Query.QueryHandler import QueryHandler
 class PaginateMessagesQueryHandler(QueryHandler):
     """Handler para paginar mensajes usando cursor"""
 
+    @inject
     def __init__(self, message_repository: MessageRepository) -> None:
         self._message_repository = message_repository
 

@@ -63,11 +63,21 @@ class UpsertMessageController(Controller):
             )
 
         except ValueError as e:
-            # Re-raise para ser manejado por middleware de errores
-            raise e
-        except Exception as e:
-            # Log error y re-raise
-            raise e
+            # AC3 & AC4: Retornar error 400 para validaciones
+            error_body = json.dumps({"error": str(e)})
+            return Response(
+                content=error_body,
+                status_code=status.HTTP_400_BAD_REQUEST,
+                media_type="application/json",
+            )
+        except Exception:
+            # Error interno del servidor
+            error_body = json.dumps({"error": "Internal server error"})
+            return Response(
+                content=error_body,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                media_type="application/json",
+            )
 
     def get_router(self) -> APIRouter:
         """Obtiene el router de la API para este controlador"""

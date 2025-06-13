@@ -42,7 +42,7 @@ class TestUpsertMessageController:
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.body == b'{"message": "Message created successfully"}'
+        assert response.body == b'{"message": "Message upserted successfully"}'
 
         # Verificar que se llamó al handler con el comando correcto
         mock_command_handler.handle.assert_called_once()
@@ -82,7 +82,7 @@ class TestUpsertMessageController:
     async def test_upsert_message_validates_payload(
         self, controller: UpsertMessageController, mock_command_handler: Mock
     ) -> None:
-        """Test AC3: PUT con payload inválido → 422"""
+        """Test AC3: PUT con payload inválido → 400"""
         # Arrange
         conversation_id = "conv-123"
         message_id = "msg-456"
@@ -92,11 +92,14 @@ class TestUpsertMessageController:
             "owner": "user-789",
         }
 
-        # Act & Assert
-        with pytest.raises(ValueError, match="MessageContent no puede estar vacío"):
-            await controller.upsert_message(
-                conversation_id, message_id, invalid_request_body
-            )
+        # Act
+        response = await controller.upsert_message(
+            conversation_id, message_id, invalid_request_body
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert b"MessageContent no puede estar vac" in response.body
 
         # No debe llamar al handler si hay error de validación
         mock_command_handler.handle.assert_not_called()
@@ -105,7 +108,7 @@ class TestUpsertMessageController:
     async def test_upsert_message_validates_id_consistency(
         self, controller: UpsertMessageController, mock_command_handler: Mock
     ) -> None:
-        """Test AC4: Msg id inmutable: cambiar path id ≠ body id → 409"""
+        """Test AC4: Msg id inmutable: cambiar path id ≠ body id → 400"""
         # Arrange
         conversation_id = "conv-123"
         message_id = "msg-456"
@@ -115,25 +118,33 @@ class TestUpsertMessageController:
             "owner": "user-789",
         }
 
-        # Act & Assert
-        with pytest.raises(
-            ValueError, match="Message ID en path y body deben coincidir"
-        ):
-            await controller.upsert_message(conversation_id, message_id, request_body)
+        # Act
+        response = await controller.upsert_message(
+            conversation_id, message_id, request_body
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert b"Message ID en path y body deben coincidir" in response.body
 
     @pytest.mark.unit
     async def test_upsert_message_handles_command_handler_error(
         self, controller: UpsertMessageController, mock_command_handler: Mock
     ) -> None:
-        """Test manejo de errores del command handler"""
+        """Test manejo de errores del command handler → 500"""
         # Arrange
         conversation_id = "conv-123"
         message_id = "msg-456"
         request_body = {"id": message_id, "content": "Contenido", "owner": "user-789"}
 
         # Simular error en el handler
-        mock_command_handler.handle.side_effect = ValueError("Message ID inmutable")
+        mock_command_handler.handle.side_effect = RuntimeError("Database error")
 
-        # Act & Assert
-        with pytest.raises(ValueError, match="Message ID inmutable"):
-            await controller.upsert_message(conversation_id, message_id, request_body)
+        # Act
+        response = await controller.upsert_message(
+            conversation_id, message_id, request_body
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert b"Internal server error" in response.body

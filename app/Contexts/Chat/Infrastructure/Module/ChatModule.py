@@ -39,6 +39,9 @@ from app.Contexts.Chat.Message.Application.Search.PaginateMessagesQueryHandler i
 from app.Contexts.Chat.Message.Domain.MessageChronologyChecker import (
     MessageChronologyChecker,
 )
+from app.Contexts.Chat.Message.Infrastructure.Http.PaginateMessagesController import (
+    PaginateMessagesController,
+)
 from app.Contexts.Chat.Message.Infrastructure.Http.UpsertMessageController import (
     UpsertMessageController,
 )
@@ -77,6 +80,7 @@ class ChatModule(ApplicationModule, Module):
         # Controllers
         binder.bind(UpsertMessageController, scope=singleton)
         binder.bind(GetConversationController, scope=singleton)
+        binder.bind(PaginateMessagesController, scope=singleton)
 
     def map_commands(self) -> list[tuple[type[Any], type[Any]]]:
         """Map commands to their handlers"""
